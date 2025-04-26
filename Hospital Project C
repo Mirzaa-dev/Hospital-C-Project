@@ -1,0 +1,366 @@
+#include<stdio.h>
+#include<windows.h>
+#include<conio.h>
+#include<ctype.h>
+#include<string.h>
+#include<stdlib.h>
+
+// Global variables and structures
+char ans=0;
+int ok;
+int b,valid=0;
+
+struct patient {
+    int age;
+    char Gender;
+    char First_Name[20];
+    char Last_Name[20];
+    char Contact_no[15];
+    char Address[30];
+    char Email[30];
+    char Doctor[20];
+    char Problem[20];
+};
+
+struct patient p;
+
+// Function declarations
+void WelcomeScreen(void);
+void Title(void);
+void MainMenu(void);
+void LoginScreen(void);
+void Add_rec(void);
+void Func_list(void);
+void Search_rec(void);
+void Edit_rec(void);
+void Dlt_rec(void);
+void ex_it(void);
+
+void gotoxy(short x, short y) {
+    COORD pos = {x, y};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
+
+int main() {
+    WelcomeScreen();
+    Title();
+    LoginScreen();
+    return 0;
+}
+
+void WelcomeScreen(void) {
+    printf("\n\n\n\t\t#########################################");
+    printf("\n\t\t#\t WELCOME TO\t\t\t#");
+    printf("\n\t\t# KARACHI HOSPITAL MANAGEMENT SYSTEM    #");
+    printf("\n\t\t########################################\n");
+    printf("\n\t\tPress any key to continue...");
+    getch();
+    system("cls");
+}
+
+void Title(void) {
+    printf("\n\t___________________________________________________________");
+    printf("\n\t\t\tKARACHI HOSPITAL");
+    printf("\n\t___________________________________________________________\n");
+}
+
+void LoginScreen(void) {
+    int attempts = 0;
+    char username[15];
+    char password[15];
+    const char original_Username[] = "RHM";
+    const char original_Password[] = "22918";
+
+    do {
+        printf("\n\tEnter Username: ");
+        scanf("%s", username);
+        printf("\n\tEnter Password: ");
+        scanf("%s", password);
+
+        if (strcmp(username, original_Username) == 0 && strcmp(password, original_Password) == 0) {
+            printf("\n\tLogin Successful!\n");
+            getch();
+            MainMenu();
+            return;
+        } else {
+            printf("\n\tInvalid Username or Password. Try again.\n");
+            attempts++;
+        }
+    } while (attempts < 3);
+
+    printf("\n\tToo many failed attempts. Exiting...");
+    getch();
+    ex_it();
+}
+
+void MainMenu(void) {
+    int choice;
+    do {
+        system("cls");
+        Title();
+        printf("\n\t1. Add Patient Record\n");
+        printf("\t2. List Patient Records\n");
+        printf("\t3. Search Patient Record\n");
+        printf("\t4. Edit Patient Record\n");
+        printf("\t5. Delete Patient Record\n");
+        printf("\t6. Exit\n");
+        printf("\n\tChoose an option (1-6): ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: Add_rec(); break;
+            case 2: Func_list(); break;
+            case 3: Search_rec(); break;
+            case 4: Edit_rec(); break;
+            case 5: Dlt_rec(); break;
+            case 6: ex_it(); break;
+            default: printf("\n\tInvalid choice. Try again.\n");
+        }
+    } while (choice != 6);
+}
+
+void ex_it(void) {
+    system("cls");
+    Title();
+    printf("\n\tThank you for using Karachi Hospital Management System. Goodbye!\n");
+    getch();
+    exit(0);
+}
+
+void Add_rec(void) {
+    FILE *ek;
+    ek = fopen("Record2.dat", "a");
+    if (!ek) {
+        printf("\n\tError opening file!\n");
+        return;
+    }
+
+    system("cls");
+    Title();
+    printf("\n\tAdding a New Patient Record\n");
+
+    printf("\n\tEnter First Name: ");
+    scanf("%s", p.First_Name);
+    p.First_Name[0] = toupper(p.First_Name[0]);
+
+    printf("\tEnter Last Name: ");
+    scanf("%s", p.Last_Name);
+    p.Last_Name[0] = toupper(p.Last_Name[0]);
+
+    printf("\tEnter Gender (M/F): ");
+    scanf(" %c", &p.Gender);
+    p.Gender = toupper(p.Gender);
+
+    printf("\tEnter Age: ");
+    scanf("%d", &p.age);
+
+    printf("\tEnter Address: ");
+    scanf("%s", p.Address);
+    p.Address[0] = toupper(p.Address[0]);
+
+    printf("\tEnter Contact No: ");
+    scanf("%s", p.Contact_no);
+
+    printf("\tEnter Email: ");
+    scanf("%s", p.Email);
+
+    printf("\tEnter Problem: ");
+    scanf("%s", p.Problem);
+    p.Problem[0] = toupper(p.Problem[0]);
+
+    printf("\tEnter Prescribed Doctor: ");
+    scanf("%s", p.Doctor);
+    p.Doctor[0] = toupper(p.Doctor[0]);
+
+    fprintf(ek, "%s %s %c %d %s %s %s %s %s\n", p.First_Name, p.Last_Name, p.Gender, p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor);
+    fclose(ek);
+
+    printf("\n\tRecord added successfully!\n");
+    getch();
+    MainMenu();
+}
+
+void Func_list(void) {
+    FILE *ek;
+    ek = fopen("Record2.dat", "r");
+    if (!ek) {
+        printf("\n\tError opening file!\n");
+        return;
+    }
+
+    system("cls");
+    Title();
+    printf("\n\tPatient Records\n");
+    printf("==================================================================================================================\n");
+    printf("Name\t\tGender\tAge\tAddress\t\tContact\t\tEmail\t\t\tProblem\t\tDoctor\n");
+    printf("==================================================================================================================\n");
+
+
+    while (fscanf(ek, "%s %s %c %d %s %s %s %s %s\n", p.First_Name, p.Last_Name, &p.Gender, &p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor) != EOF) {
+        printf("\n%s%s\t %c\t%d\t %s\t\t%s\t%s\t\t%s\t\t%s", p.First_Name, p.Last_Name, p.Gender, p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor);
+    }
+
+    fclose(ek);
+    getch();
+    MainMenu();
+}
+
+void Search_rec(void) {
+    char name[20];
+    int found = 0;
+    FILE *ek;
+    ek = fopen("Record2.dat", "r");
+    if (!ek) {
+        printf("\n\tError opening file!\n");
+        return;
+    }
+
+    system("cls");
+    Title();
+    printf("\n\tSearch Patient Record\n");
+
+    printf("\n\tEnter First Name to Search: ");
+    scanf("%s", name);
+    name[0] = toupper(name[0]);
+
+    while (fscanf(ek, "%s %s %c %d %s %s %s %s %s\n", p.First_Name, p.Last_Name, &p.Gender, &p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor) != EOF) {
+        if (strcmp(p.First_Name, name) == 0) {
+            printf("\n\tRecord Found:\n");
+            printf("\n\tName: %s %s\n\tGender: %c\n\tAge: %d\n\tAddress: %s\n\tContact: %s\n\tEmail: %s\n\tProblem: %s\n\tDoctor: %s\n",
+                   p.First_Name, p.Last_Name, p.Gender, p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("\n\tNo Record Found with the name %s.\n", name);
+    }
+
+    fclose(ek);
+    getch();
+    MainMenu();
+}
+
+void Edit_rec(void) {
+    char name[20];
+    int found = 0;
+    FILE *ek, *temp;
+    ek = fopen("Record2.dat", "r");
+    temp = fopen("Temp.dat", "w");
+
+    if (!ek || !temp) {
+        printf("\n\tError opening file!\n");
+        return;
+    }
+
+    system("cls");
+    Title();
+    printf("\n\tEdit Patient Record\n");
+
+    printf("\n\tEnter First Name of the Patient to Edit: ");
+    scanf("%s", name);
+    name[0] = toupper(name[0]);
+
+    while (fscanf(ek, "%s %s %c %d %s %s %s %s %s\n", p.First_Name, p.Last_Name, &p.Gender, &p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor) != EOF) {
+        if (strcmp(p.First_Name, name) == 0) {
+            printf("\n\tRecord Found. Enter New Details:\n");
+
+            printf("\n\tEnter First Name: ");
+            scanf("%s", p.First_Name);
+            p.First_Name[0] = toupper(p.First_Name[0]);
+
+            printf("\tEnter Last Name: ");
+            scanf("%s", p.Last_Name);
+            p.Last_Name[0] = toupper(p.Last_Name[0]);
+
+            printf("\tEnter Gender (M/F): ");
+            scanf(" %c", &p.Gender);
+            p.Gender = toupper(p.Gender);
+
+            printf("\tEnter Age: ");
+            scanf("%d", &p.age);
+
+            printf("\tEnter Address: ");
+            scanf("%s", p.Address);
+            p.Address[0] = toupper(p.Address[0]);
+
+            printf("\tEnter Contact No: ");
+            scanf("%s", p.Contact_no);
+
+            printf("\tEnter Email: ");
+            scanf("%s", p.Email);
+
+            printf("\tEnter Problem: ");
+            scanf("%s", p.Problem);
+            p.Problem[0] = toupper(p.Problem[0]);
+
+            printf("\tEnter Prescribed Doctor: ");
+            scanf("%s", p.Doctor);
+            p.Doctor[0] = toupper(p.Doctor[0]);
+
+            fprintf(temp, "%s %s %c %d %s %s %s %s %s\n", p.First_Name, p.Last_Name, p.Gender, p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor);
+            found = 1;
+        } else {
+            fprintf(temp, "%s %s %c %d %s %s %s %s %s\n", p.First_Name, p.Last_Name, p.Gender, p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor);
+        }
+    }
+
+    fclose(ek);
+    fclose(temp);
+
+    if (found) {
+        remove("Record2.dat");
+        rename("Temp.dat", "Record2.dat");
+        printf("\n\tRecord Updated Successfully!\n");
+    } else {
+        printf("\n\tNo Record Found with the name %s.\n", name);
+    }
+
+    getch();
+    MainMenu();
+}
+
+void Dlt_rec(void) {
+    char name[20];
+    int found = 0;
+    FILE *ek, *temp;
+    ek = fopen("Record2.dat", "r");
+    temp = fopen("Temp.dat", "w");
+
+    if (!ek || !temp) {
+        printf("\n\tError opening file!\n");
+        return;
+    }
+
+    system("cls");
+    Title();
+    printf("\n\tDelete Patient Record\n");
+
+    printf("\n\tEnter First Name of the Patient to Delete: ");
+    scanf("%s", name);
+    name[0] = toupper(name[0]);
+
+    while (fscanf(ek, "%s %s %c %d %s %s %s %s %s\n", p.First_Name, p.Last_Name, &p.Gender, &p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor) != EOF) {
+        if (strcmp(p.First_Name, name) == 0) {
+            printf("\n\tRecord Found and Deleted Successfully!\n");
+            found = 1;
+        } else {
+            fprintf(temp, "%s %s %c %d %s %s %s %s %s\n", p.First_Name, p.Last_Name, p.Gender, p.age, p.Address, p.Contact_no, p.Email, p.Problem, p.Doctor);
+        }
+    }
+
+    fclose(ek);
+    fclose(temp);
+
+    if (found) {
+        remove("Record2.dat");
+        rename("Temp.dat", "Record2.dat");
+    } else {
+        printf("\n\tNo Record Found with the name %s.\n", name);
+    }
+
+    getch();
+    MainMenu();
+}
+
